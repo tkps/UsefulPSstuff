@@ -1,3 +1,4 @@
+#Written by tkps@github
 Function Get-ADDeletedObjectBySID
 {
     Param(
