@@ -21,7 +21,7 @@ Function Search-DHCPScopesOption6
     Param(
         #IP Address of the DNS Server to look for in Option 6
         [Parameter(Mandatory=$true,
-                    ValueFromPipelineByPropertyName=$true)]
+                    ValueFromPipeline=$true)]
                     [ipaddress[]]
                     $IPAddress
     )
