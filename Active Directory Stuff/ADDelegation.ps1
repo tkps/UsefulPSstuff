@@ -3,11 +3,9 @@ Function New-ADDelegation
 {
     Param(
         [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty]
         [string[]]
         $DistinguishedName,
         [Parameter(Mandatory=$true)]
-        [ValidateNotNullOrEmpty]
         $GroupName,
         [Parameter()]
         [ValidateSet("User","Computer","Group","msDS-GroupManagedServiceAccount","msDS-ManagedServiceAccount")]
@@ -95,6 +93,20 @@ Function New-ADDelegation
             $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $ADGroup,"WriteProperty","Allow","Descendents",$GUID
             $AllAces.Add($Ace)
             
+            switch ($ObjectType)
+            {
+                'User' {
+                            $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $ADGroup,"ExtendedRight","Allow",$extendedrightsmap["Reset Password"],"Descendents",$GUID
+                            $AllAces.Add($Ace)
+                        }
+                'Computer' {
+                            # $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $ADGroup,"ExtendedRight","Allow",$extendedrightsmap["Validated write to service principal name"],"Descendents",$GUID
+                            # $AllAces.Add($Ace)
+
+                            # $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $ADGroup,"ExtendedRight","Allow",$extendedrightsmap["Validated write to DNS host name"],"Descendents",$GUID
+                            # $AllAces.Add($Ace)  
+                        }
+            }
             $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $ADGroup,"ExtendedRight","Allow",$extendedrightsmap["Reset Password"],"Descendents",$guidmap["user"]
             $AllAces.Add($Ace)
 
@@ -109,4 +121,3 @@ Function New-ADDelegation
         }
     }
 }
-
