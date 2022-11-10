@@ -63,6 +63,5 @@ Foreach ($Company in $Companies)
                 New-ADDelegation -DistinguishedName (Get-ADOrganizationalUnit -Filter {Name -eq $Type} -SearchBase $CompanyOU.DistinguishedName) -GroupName $Grp.Name -ObjectType Computer -AllowGpoLink -AllowSubOU
             }
         }
-
     }
 }
