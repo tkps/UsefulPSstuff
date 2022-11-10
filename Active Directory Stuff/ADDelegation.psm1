@@ -1,6 +1,10 @@
 
 Function New-ADDelegation
 {
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'High'
+    )]
     Param(
         [Parameter(Mandatory=$true)]
         [string[]]
@@ -64,7 +68,7 @@ Function New-ADDelegation
             }
 
             $ACL = get-acl $OU
-            $AllAces = New-Object System.Collections.Generic.List[System.Object]
+            $AllAces = New-Object System.Collections.Generic.List[System.DirectoryServices.ActiveDirectoryAccessRule]
             $GUID = $guidmap["$ObjectType"]
             
             If ($AllowSubOU.IsPresent)
@@ -111,9 +115,15 @@ Function New-ADDelegation
             $AllAces.Add($Ace)
 
             ForEach ($Ace in $AllAces){
-                $acl.AddAccessRule($Ace)}
-                
-            Set-Acl -aclobject $ACL -Path $OU
+                $acl.AddAccessRule($Ace)
+            }
+            try {
+                Set-Acl -aclobject $ACL -Path $OU -WhatIf:$WhatIfPreference -Confirm:$ConfirmPreference
+            }
+            catch {
+                $_
+                Write-Error "Error setting acl on $OU"
+            }
 
             #Reset variables
             $ACL = $null
