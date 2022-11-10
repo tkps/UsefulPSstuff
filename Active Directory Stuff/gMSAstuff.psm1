@@ -79,3 +79,49 @@ Function New-gMSAScheduledTask
         exit 155
     }
 }
+Function Add-GmsaPrincipal
+{
+    [CmdletBinding(
+        SupportsShouldProcess = $true,
+        ConfirmImpact = 'Medium'
+    )]
+    Param(
+        [Parameter(Mandatory=$true,Position=0,ValueFromPipelineByPropertyName)]
+        [String[]]
+        $DistinguishedName,
+        [Parameter()]
+        [String]
+        [ValidateScript({Get-ADObject $_})]
+        $NewPrincipal,
+        [Switch]$Force
+        )
+    Begin {
+        if ($Force -and -not $Confirm){
+            $ConfirmPreference = 'None'
+        }
+        try {
+            Import-Module ActiveDirectory -ErrorAction Stop
+        }
+        Catch{
+            Write-Error "Error loading Active Directory module"
+            exit 3
+        }
+    }
+    Process{
+        Foreach ($Row in $DistinguishedName)
+        {
+            If ($Force -or $PSCmdlet.ShouldProcess($Row,'Add'))
+            {
+                try
+                {
+                    Get-ADServiceAccount -Identity $Row -Properties PrincipalsAllowedToRetrieveManagedPassword | Set-ADServiceAccount -PrincipalsAllowedToRetrieveManagedPassword ($_.PrincipalsAllowedToRetrieveManagedPassword + $Principal) -PassThru
+                }
+                Catch
+                {
+                    Write-Error "Error adding $Principal as a principal to $Row"
+                    Exit 4
+                }
+            }
+        }
+    }
+}
