@@ -6,11 +6,16 @@ Function New-ADDelegation
         ConfirmImpact = 'High'
     )]
     Param(
+        #DistinguishedName of the OU which ACL should be modified
         [Parameter(Mandatory=$true)]
         [string[]]
         $DistinguishedName,
+
+        #Name of the AD Group which will be delegated permissions
         [Parameter(Mandatory=$true)]
         $GroupName,
+
+        #What type of object to delegate permissions for
         [Parameter()]
         [ValidateSet("User","Computer","Group","msDS-GroupManagedServiceAccount","msDS-ManagedServiceAccount")]
         [string]
@@ -22,7 +27,14 @@ Function New-ADDelegation
         )
     Begin
     {
-        Import-Module ActiveDirectory
+        Try
+        {
+            Import-Module ActiveDirectory
+        }
+        Catch {
+            Write-Error "Error loading Active Directory module"
+            exit 3
+        }
         Set-Location AD:
 
         $rootdse = Get-ADRootDSE 
@@ -111,9 +123,6 @@ Function New-ADDelegation
                             # $AllAces.Add($Ace)  
                         }
             }
-            $Ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $ADGroup,"ExtendedRight","Allow",$extendedrightsmap["Reset Password"],"Descendents",$guidmap["user"]
-            $AllAces.Add($Ace)
-
             ForEach ($Ace in $AllAces){
                 $acl.AddAccessRule($Ace)
             }
