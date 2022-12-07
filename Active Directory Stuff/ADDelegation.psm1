@@ -69,6 +69,7 @@ Function New-ADDelegation
             Catch
             {
                 Write-Error "Could not find OU: $Value"
+                continue
             }
             Try
             {
@@ -77,6 +78,7 @@ Function New-ADDelegation
             Catch
             {
                 Write-Error "Could not find Group: $GroupName"
+                return
             }
 
             $ACL = get-acl $OU
