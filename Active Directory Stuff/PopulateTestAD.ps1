@@ -279,7 +279,8 @@ Function New-Password {
         [switch]$NoUpper,
         [switch]$NoLower,
         [switch]$NoDigits,
-        [switch]$NoSpecial
+        [switch]$NoSpecial,
+        [switch]$AsSecureString
     )
     Begin
     {
@@ -299,11 +300,15 @@ Function New-Password {
         {
             $PW += $All | Get-Random
         }
+        If ($PW.length -gt 1){
+            $PW = ($PW.ToCharArray() | Sort-Object {Get-Random}) -Join ""
+        }
     }
     End {
-        If ($PW.length -gt 1){
-            ($PW.ToCharArray() | Sort-Object {Get-Random}) -Join ""
-        }else{
+        If ($AsSecureString.IsPresent)
+        {
+            ConvertTo-SecureString -AsPlainText -Force -String $PW
+        }Else{
             $PW
         }
     }
