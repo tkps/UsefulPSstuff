@@ -275,29 +275,37 @@ Foreach ($Company in $Companies)
 "@ | COnvertfrom-csv | Sort-Object {Get-Random}
 Function New-Password {
     Param(
-        [int]$Length = 14
+        [int]$Length = 14,
+        [switch]$NoUpper,
+        [switch]$NoLower,
+        [switch]$NoDigits,
+        [switch]$NoSpecial
     )
     Begin
     {
-        $Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray()
-        $Lower = "abcdefghijklmnopqrstuvwxyz".ToCharArray()
-        $Digits = "0123456789".ToCharArray()
-        $Special = "!#¤%&/()=?,.-;:_'*^@+".ToCharArray()
+        If (-not $NoUpper.IsPresent){$Upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray()}
+        If (-not $NoLower.IsPresent){$Lower = "abcdefghijklmnopqrstuvwxyz".ToCharArray()}
+        If (-not $NoDigits.IsPresent){$Digits = "0123456789".ToCharArray()}
+        If (-not $NoSpecial.IsPresent){$Special = "!#%&/()=?,.-;:_'*^@+".ToCharArray()}
         $All = $Upper + $Lower + $Digits + $Special
     }
     Process
     {
-        $PW = $Upper | Get-Random
-        $PW += $Lower | Get-Random
-        $PW += $Digits | Get-Random
-        $PW += $Special | Get-Random
+        If (-not $NoUpper.IsPresent -and $PW.length -lt $Length){$PW = $Upper | Get-Random}
+        If (-not $NoLower.IsPresent -and $PW.length -lt $Length){$PW += $Lower | Get-Random}
+        If (-not $NoDigits.IsPresent -and $PW.length -lt $Length){$PW += $Digits | Get-Random}
+        If (-not $NoSpecial.IsPresent -and $PW.length -lt $Length){$PW += $Special | Get-Random}
         While ($PW.length -lt $Length)
         {
             $PW += $All | Get-Random
         }
     }
     End {
-        $PW
+        If ($PW.length -gt 1){
+            ($PW.ToCharArray() | Sort-Object {Get-Random}) -Join ""
+        }else{
+            $PW
+        }
     }
 }
 Function Get-NormalizedString{
