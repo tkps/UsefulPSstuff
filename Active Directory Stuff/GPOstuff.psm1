@@ -11,7 +11,7 @@ Function Get-GPOOrphans
     {
         $GPOs = Get-GPO -All -Domain $Domain
 
-        $OUs = Get-ADOrganizationalUnit -Filter * | Select-Object -ExpandProperty DistinguishedName
+        $OUs = Get-ADOrganizationalUnit -Filter * -Server $Domain | Select-Object -ExpandProperty DistinguishedName
         $OUs += Get-ADDomain -Identity $Domain | Select-Object -ExpandProperty DistinguishedName
 
         $GPLinks = $OUs | ForEach-Object {Get-GPInheritance $_ -Domain $Domain}
