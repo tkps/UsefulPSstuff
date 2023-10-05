@@ -11,8 +11,8 @@ function Test-Function {
     {
         if ($Row -eq 'E')
         {
-            If ($Break.IsPresent) {break}     # <- abort loop
             If ($Continue.IsPresent) {continue}  # <- skip just this iteration, but continue loop
+            If ($Break.IsPresent) {break}     # <- abort loop
             If ($Return.IsPresent) {return}    # <- abort code, and continue in caller scope
             If ($Exit.IsPresent) {exit}      # <- abort code at caller scope 
         }
